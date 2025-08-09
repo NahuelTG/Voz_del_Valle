@@ -1,0 +1,78 @@
+/* src/components/features/routes/EnhancedRouteSlider.module.css */
+.routeSlider {
+   position: fixed;
+   bottom: -100%;
+   left: 0;
+   right: 0;
+   background: var(--surface);
+   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+   box-shadow: var(--shadow);
+   z-index: 200;
+   transition: bottom var(--transition-normal);
+   max-height: 70dvh;
+}
+
+.routeSlider.visible {
+   bottom: 60px;
+}
+
+.sliderHandle {
+   width: 40px;
+   height: 4px;
+   background: var(--bg-secondary);
+   border-radius: 2px;
+   margin: var(--space-md) auto 0;
+}
+
+.sliderHeader {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   padding: var(--space-md) var(--space-lg);
+}
+
+.sliderHeader h3 {
+   color: var(--text-primary);
+}
+
+.sliderHeader button {
+   background: none;
+   border: none;
+   font-size: 1.2rem;
+   cursor: pointer;
+   color: var(--text-secondary);
+}
+
+.sliderContent {
+   padding: 0 var(--space-lg) var(--space-lg);
+}
+
+.sliderContent p {
+   color: var(--text-secondary);
+   margin-bottom: var(--space-lg);
+}
+
+.routeActions {
+   display: flex;
+   gap: var(--space-md);
+}
+
+.primaryButton {
+   background: var(--primary-green);
+   color: white;
+   border: none;
+   padding: var(--space-md) var(--space-lg);
+   border-radius: var(--radius-sm);
+   cursor: pointer;
+   flex: 1;
+}
+
+.lockedButton {
+   background: #95a5a6;
+   color: white;
+   border: none;
+   padding: var(--space-md) var(--space-lg);
+   border-radius: var(--radius-sm);
+   cursor: pointer;
+   flex: 1;
+}

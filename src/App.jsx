@@ -1,100 +1,46 @@
+// src/App.jsx
 import { useState } from "react";
-import MapView from "./components/MapView";
-import Sidebar from "./components/Sidebar";
-import EnhancedRouteSlider from "./components/EnhancedRouteSlider";
-import MenuButton from "./components/MenuButton";
-import BottomNavigation from "./components/BottomNavigation";
-import RoutesView from "./components/RoutesView";
-import AdventuresView from "./components/AdventuresView";
-import ProfileView from "./components/ProfileView";
-import CodeModal from "./components/CodeModal";
-import "./App.css";
+import { useTheme } from "./hooks/useTheme";
+import { useLocalStorage } from "./hooks/useLocalStorage";
+
+import MapView from "./components/features/map/MapView";
+import RoutesView from "./components/features/routes/RoutesView";
+import AdventuresView from "./components/features/adventures/AdventuresView";
+import ProfileView from "./components/features/profile/ProfileView";
+import Sidebar from "./components/layout/Sidebar/Sidebar";
+import BottomNavigation from "./components/layout/BottomNavigation/BottomNavigation";
+import MenuButton from "./components/layout/MenuButton/MenuButton";
+import EnhancedRouteSlider from "./components/features/routes/EnhancedRouteSlider";
+import CodeModal from "./components/features/code/CodeModal";
+
+import { VIEWS, ROUTES_DATA, ACHIEVEMENTS_DATA } from "./utils/constants";
+
+import styles from "./App.module.css";
 
 const App = () => {
+   const { theme, toggleTheme } = useTheme();
+   const [unlockedRoutes, setUnlockedRoutes] = useLocalStorage("unlockedRoutes", [1]);
+
    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
    const [selectedRoute, setSelectedRoute] = useState(null);
-   const [currentView, setCurrentView] = useState("mapa");
-   const [isDarkMode, setIsDarkMode] = useState(false);
+   const [currentView, setCurrentView] = useState(VIEWS.MAP);
    const [showCodeModal, setShowCodeModal] = useState(false);
-   const [unlockedRoutes, setUnlockedRoutes] = useState([1]); // Ruta 1 desbloqueada por defecto
 
-   const routes = [
-      {
-         id: 1,
-         title: "Ruta Sonora – La Voz del Valle",
-         description:
-            "Descubre los sonidos únicos del valle a través de paisajes sonoros naturales y testimonios locales que han resonado por generaciones.",
-         duration: "45 min",
-         distance: "2.3 km",
-         difficulty: "Fácil",
-         code: "VALLE2024",
-         isUnlocked: true,
-         points: [
-            { id: 1, name: "Mirador del Valle", type: "audio", icon: "🎵" },
-            { id: 2, name: "Cascada Susurrante", type: "ar", icon: "📱" },
-            { id: 3, name: "Plaza de los Ecos", type: "info", icon: "ℹ️" },
-            { id: 4, name: "Bosque Sonoro", type: "audio", icon: "🎵" },
-         ],
-         stats: { photos: 12, timeSpent: "1h 23m", challenges: 3 },
-      },
-      {
-         id: 2,
-         title: "Caminos de Memoria",
-         description: "Un recorrido por los lugares históricos más emblemáticos de la región, donde cada piedra cuenta una historia.",
-         duration: "60 min",
-         distance: "3.1 km",
-         difficulty: "Medio",
-         code: "MEMORIA2024",
-         isUnlocked: false,
-         points: [
-            { id: 1, name: "Casa Colonial", type: "ar", icon: "📱" },
-            { id: 2, name: "Puente Histórico", type: "info", icon: "ℹ️" },
-            { id: 3, name: "Museo al Aire Libre", type: "audio", icon: "🎵" },
-         ],
-         stats: { photos: 0, timeSpent: "0m", challenges: 0 },
-      },
-      {
-         id: 3,
-         title: "Ecos del Pasado",
-         description: "Historias y leyendas transmitidas de generación en generación cobran vida en este místico recorrido.",
-         duration: "30 min",
-         distance: "1.8 km",
-         difficulty: "Fácil",
-         code: "ECOS2024",
-         isUnlocked: false,
-         points: [
-            { id: 1, name: "Árbol Centenario", type: "audio", icon: "🎵" },
-            { id: 2, name: "Piedra de los Deseos", type: "ar", icon: "📱" },
-         ],
-         stats: { photos: 0, timeSpent: "0m", challenges: 0 },
-      },
-   ];
-
-   const achievements = [
-      { id: 1, name: "Explorador del Valle", icon: "🏔️", unlocked: true },
-      { id: 2, name: "Guardián del Agua", icon: "💧", unlocked: false },
-      { id: 3, name: "Maestro de Sonidos", icon: "🎼", unlocked: false },
-   ];
-
-   const toggleSidebar = () => {
-      setIsSidebarOpen(!isSidebarOpen);
-   };
+   const enrichedRoutes = ROUTES_DATA.map((route) => ({
+      ...route,
+      isUnlocked: unlockedRoutes.includes(route.id),
+   }));
 
    const handleRouteSelect = (route) => {
-      const isUnlocked = unlockedRoutes.includes(route.id);
-      setSelectedRoute({ ...route, isUnlocked });
+      const enrichedRoute = { ...route, isUnlocked: unlockedRoutes.includes(route.id) };
+      setSelectedRoute(enrichedRoute);
       setIsSidebarOpen(false);
    };
 
-   const handleViewChange = (view) => {
-      setCurrentView(view);
-      setSelectedRoute(null);
-   };
-
    const handleUnlockRoute = (code) => {
-      const route = routes.find((r) => r.code === code);
+      const route = ROUTES_DATA.find((r) => r.code === code);
       if (route && !unlockedRoutes.includes(route.id)) {
-         setUnlockedRoutes([...unlockedRoutes, route.id]);
+         setUnlockedRoutes((prev) => [...prev, route.id]);
          setShowCodeModal(false);
          return true;
       }
@@ -102,48 +48,31 @@ const App = () => {
    };
 
    const renderCurrentView = () => {
+      const viewProps = { theme };
+
       switch (currentView) {
-         case "rutas":
-            return (
-               <RoutesView
-                  routes={routes.map((r) => ({ ...r, isUnlocked: unlockedRoutes.includes(r.id) }))}
-                  onRouteSelect={handleRouteSelect}
-                  isDarkMode={isDarkMode}
-               />
-            );
-         case "aventuras":
-            return (
-               <AdventuresView
-                  routes={routes.filter((r) => unlockedRoutes.includes(r.id))}
-                  achievements={achievements}
-                  isDarkMode={isDarkMode}
-               />
-            );
-         case "perfil":
-            return (
-               <ProfileView
-                  isDarkMode={isDarkMode}
-                  onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-                  onShowCodeModal={() => setShowCodeModal(true)}
-               />
-            );
+         case VIEWS.ROUTES:
+            return <RoutesView routes={enrichedRoutes} onRouteSelect={handleRouteSelect} {...viewProps} />;
+         case VIEWS.ADVENTURES:
+            return <AdventuresView routes={enrichedRoutes.filter((r) => r.isUnlocked)} achievements={ACHIEVEMENTS_DATA} {...viewProps} />;
+         case VIEWS.PROFILE:
+            return <ProfileView theme={theme} onToggleTheme={toggleTheme} onShowCodeModal={() => setShowCodeModal(true)} {...viewProps} />;
          default:
-            return <MapView isDarkMode={isDarkMode} />;
+            return <MapView {...viewProps} />;
       }
    };
 
    return (
-      <div className={`app ${isDarkMode ? "dark-mode" : ""}`}>
+      <div className={styles.app}>
          {renderCurrentView()}
 
-         {currentView === "mapa" && <MenuButton onClick={toggleSidebar} isOpen={isSidebarOpen} isDarkMode={isDarkMode} />}
+         {currentView === VIEWS.MAP && <MenuButton onClick={() => setIsSidebarOpen(!isSidebarOpen)} isOpen={isSidebarOpen} />}
 
          <Sidebar
             isOpen={isSidebarOpen}
             onClose={() => setIsSidebarOpen(false)}
-            routes={routes.map((r) => ({ ...r, isUnlocked: unlockedRoutes.includes(r.id) }))}
+            routes={enrichedRoutes}
             onRouteSelect={handleRouteSelect}
-            isDarkMode={isDarkMode}
          />
 
          {selectedRoute && (
@@ -151,15 +80,14 @@ const App = () => {
                route={selectedRoute}
                onClose={() => setSelectedRoute(null)}
                onShowCodeModal={() => setShowCodeModal(true)}
-               isDarkMode={isDarkMode}
             />
          )}
 
-         <BottomNavigation currentView={currentView} onViewChange={handleViewChange} isDarkMode={isDarkMode} />
+         <BottomNavigation currentView={currentView} onViewChange={setCurrentView} />
 
-         {showCodeModal && <CodeModal onClose={() => setShowCodeModal(false)} onUnlock={handleUnlockRoute} isDarkMode={isDarkMode} />}
+         <CodeModal isOpen={showCodeModal} onClose={() => setShowCodeModal(false)} onUnlock={handleUnlockRoute} />
 
-         {isSidebarOpen && <div className="overlay" onClick={() => setIsSidebarOpen(false)} />}
+         {isSidebarOpen && <div className={styles.overlay} onClick={() => setIsSidebarOpen(false)} />}
       </div>
    );
 };

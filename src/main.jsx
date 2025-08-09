@@ -1,10 +1,25 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
+// src/main.jsx (actualizado)
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import App from "./App.jsx";
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+// Importar estilos globales
+import "./styles/variables.css";
+import "./styles/themes.css";
+import "./styles/globals.css";
+
+// Configurar tema inicial antes del renderizado
+(function () {
+   const theme = localStorage.getItem("theme")
+      ? JSON.parse(localStorage.getItem("theme"))
+      : window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+   document.documentElement.setAttribute("data-theme", theme);
+})();
+
+createRoot(document.getElementById("root")).render(
+   <StrictMode>
+      <App />
+   </StrictMode>
+);

@@ -1,0 +1,53 @@
+/* src/components/features/routes/RoutesView.module.css */
+.routesView {
+   padding: var(--space-lg);
+   background: var(--bg-primary);
+   min-height: 100dvh;
+}
+
+.viewHeader h2 {
+   color: var(--text-primary);
+   margin-bottom: var(--space-sm);
+}
+
+.routesGrid {
+   display: flex;
+   flex-direction: column;
+   gap: var(--space-md);
+}
+
+.routeCard {
+   background: var(--surface);
+   padding: var(--space-lg);
+   border-radius: var(--radius-md);
+   box-shadow: var(--shadow);
+   cursor: pointer;
+   transition: transform var(--transition-fast);
+}
+
+.routeCard:hover {
+   transform: translateY(-2px);
+}
+
+.routeCard.locked {
+   opacity: 0.7;
+}
+
+.cardHeader {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   margin-bottom: var(--space-sm);
+}
+
+.cardHeader h3 {
+   color: var(--text-primary);
+}
+
+.cardMeta {
+   display: flex;
+   gap: var(--space-md);
+   margin-top: var(--space-sm);
+   font-size: 0.9rem;
+   color: var(--text-secondary);
+}

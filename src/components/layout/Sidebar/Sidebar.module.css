@@ -1,0 +1,110 @@
+/* src/components/layout/Sidebar/Sidebar.module.css */
+.sidebar {
+   position: fixed;
+   top: 0;
+   left: -70%;
+   width: 70%;
+   height: 100%;
+   background: var(--surface);
+   z-index: 999;
+   transition: left var(--transition-normal);
+   display: flex;
+   flex-direction: column;
+   box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar.open {
+   left: 0;
+}
+
+.header {
+   padding: var(--space-lg);
+   background: var(--secondary-blue);
+   color: white;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+}
+
+.header h2 {
+   font-size: 1.3rem;
+   font-weight: 600;
+}
+
+.closeButton {
+   background: none;
+   border: none;
+   color: white;
+   font-size: 1.5rem;
+   cursor: pointer;
+   padding: 5px;
+   border-radius: var(--space-xs);
+   transition: background var(--transition-fast);
+}
+
+.closeButton:hover {
+   background: rgba(255, 255, 255, 0.1);
+}
+
+.main {
+   flex: 1;
+   overflow-y: auto;
+   padding: var(--space-lg);
+}
+
+.quickRoutes h3 {
+   color: var(--text-primary);
+   font-size: 1.2rem;
+   font-weight: 600;
+   margin-bottom: var(--space-md);
+}
+
+.quickRouteItem {
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   width: 100%;
+   padding: var(--space-md);
+   background: var(--bg-secondary);
+   border: none;
+   border-radius: var(--radius-md);
+   margin-bottom: var(--space-md);
+   cursor: pointer;
+   transition: all var(--transition-fast);
+   text-align: left;
+   color: var(--text-primary);
+}
+
+.quickRouteItem:hover {
+   background: var(--border-color);
+   transform: translateX(4px);
+}
+
+.quickRouteItem.locked {
+   opacity: 0.6;
+}
+
+.quickRouteInfo h4 {
+   color: var(--text-primary);
+   font-weight: 600;
+   margin-bottom: var(--space-xs);
+   font-size: 1rem;
+}
+
+.quickRouteMeta {
+   font-size: 0.8rem;
+   color: var(--text-secondary);
+}
+
+.quickRouteArrow {
+   color: var(--primary-green);
+   font-size: 1.2rem;
+   font-weight: bold;
+}
+
+@media (min-width: 768px) {
+   .sidebar {
+      width: 350px;
+      left: -350px;
+   }
+}

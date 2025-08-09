@@ -1,0 +1,111 @@
+/* src/components/features/code/CodeModal.module.css */
+
+.header {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   padding: var(--space-lg) var(--space-lg) 0;
+}
+
+.header h3 {
+   color: var(--text-primary);
+   font-size: 1.3rem;
+   font-weight: 600;
+}
+
+.closeButton {
+   background: none;
+   border: none;
+   font-size: 1.2rem;
+   color: var(--text-secondary);
+   cursor: pointer;
+   padding: var(--space-sm);
+   border-radius: 50%;
+   transition: background var(--transition-fast);
+}
+
+.closeButton:hover {
+   background: var(--bg-secondary);
+}
+
+.content {
+   padding: var(--space-lg);
+   text-align: center;
+}
+
+.unlockIcon {
+   font-size: 3rem;
+   margin-bottom: var(--space-md);
+}
+
+.content p {
+   color: var(--text-secondary);
+   margin-bottom: var(--space-xl);
+   line-height: 1.5;
+}
+
+.inputGroup {
+   margin-bottom: var(--space-md);
+}
+
+.codeInput {
+   width: 100%;
+   padding: var(--space-md) var(--space-md);
+   border: 2px solid var(--border-color);
+   border-radius: var(--radius-sm);
+   font-size: 1rem;
+   text-align: center;
+   text-transform: uppercase;
+   letter-spacing: 2px;
+   transition: border-color var(--transition-fast);
+   background: var(--surface);
+   color: var(--text-primary);
+}
+
+.codeInput:focus {
+   outline: none;
+   border-color: var(--primary-green);
+}
+
+.errorMessage {
+   color: #e74c3c;
+   font-size: 0.9rem;
+   margin-bottom: var(--space-md);
+   padding: var(--space-sm);
+   background: rgba(231, 76, 60, 0.1);
+   border-radius: 6px;
+}
+
+.actions {
+   display: flex;
+   gap: var(--space-md);
+   margin-bottom: var(--space-lg);
+}
+
+.hints {
+   border-top: 1px solid var(--border-color);
+   padding-top: var(--space-md);
+   text-align: left;
+}
+
+.hintTitle {
+   font-size: 0.9rem;
+   font-weight: 600;
+   color: var(--text-primary);
+   margin-bottom: var(--space-sm);
+}
+
+.hintCodes {
+   display: flex;
+   flex-direction: column;
+   gap: var(--space-xs);
+}
+
+.hintCodes code {
+   background: var(--bg-secondary);
+   padding: var(--space-xs) var(--space-sm);
+   border-radius: var(--space-xs);
+   font-size: 0.8rem;
+   color: var(--text-primary);
+   font-family: "Courier New", monospace;
+}

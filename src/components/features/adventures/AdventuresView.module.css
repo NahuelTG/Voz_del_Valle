@@ -1,0 +1,44 @@
+/* src/components/features/adventures/AdventuresView.module.css */
+.adventuresView {
+   padding: var(--space-lg);
+   background: var(--bg-primary);
+   min-height: 100dvh;
+}
+
+.viewHeader h2 {
+   color: var(--text-primary);
+   margin-bottom: var(--space-sm);
+}
+
+.statsOverview {
+   display: flex;
+   gap: var(--space-md);
+   margin-bottom: var(--space-xl);
+}
+
+.statCard {
+   background: var(--surface);
+   padding: var(--space-lg);
+   border-radius: var(--radius-md);
+   text-align: center;
+   box-shadow: var(--shadow);
+}
+
+.achievements h3 {
+   color: var(--text-primary);
+   margin-bottom: var(--space-md);
+}
+
+.achievementsGrid {
+   display: grid;
+   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+   gap: var(--space-md);
+}
+
+.achievementCard {
+   background: var(--surface);
+   padding: var(--space-md);
+   border-radius: var(--radius-md);
+   text-align: center;
+   box-shadow: var(--shadow);
+}

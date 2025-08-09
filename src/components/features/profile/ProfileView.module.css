@@ -1,0 +1,135 @@
+/* src/components/features/profile/ProfileView.module.css */
+.profileView {
+   padding: var(--space-lg) var(--space-lg) 80px;
+   min-height: 100dvh;
+   background: var(--bg-primary);
+}
+
+.viewHeader {
+   margin-bottom: var(--space-xl);
+}
+
+.viewHeader h2 {
+   color: var(--text-primary);
+   font-size: 1.8rem;
+   font-weight: 700;
+   margin-bottom: var(--space-xs);
+}
+
+.viewHeader p {
+   color: var(--text-secondary);
+   font-size: 0.95rem;
+}
+
+.profileSection {
+   margin-bottom: var(--space-xl);
+}
+
+.profileSection h3 {
+   color: var(--text-primary);
+   font-size: 1.2rem;
+   font-weight: 600;
+   margin-bottom: var(--space-md);
+}
+
+.settingItem {
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   padding: var(--space-md);
+   background: var(--surface);
+   border-radius: var(--radius-md);
+   margin-bottom: var(--space-sm);
+   box-shadow: var(--shadow);
+}
+
+.settingButton {
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   width: 100%;
+   padding: var(--space-md);
+   background: var(--surface);
+   border: none;
+   border-radius: var(--radius-md);
+   margin-bottom: var(--space-sm);
+   box-shadow: var(--shadow);
+   cursor: pointer;
+   transition: all var(--transition-fast);
+   color: var(--text-primary);
+}
+
+.settingButton:hover {
+   transform: translateY(-1px);
+   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.settingInfo {
+   display: flex;
+   align-items: center;
+   gap: var(--space-md);
+}
+
+.settingIcon {
+   font-size: 1.5rem;
+}
+
+.settingInfo h4 {
+   color: var(--text-primary);
+   font-weight: 600;
+   margin-bottom: 2px;
+}
+
+.settingInfo p {
+   color: var(--text-secondary);
+   font-size: 0.85rem;
+}
+
+.arrowIcon {
+   color: var(--text-secondary);
+   font-size: 1.2rem;
+}
+
+.volumeSlider {
+   width: 100px;
+   height: 4px;
+   border-radius: 2px;
+   background: var(--bg-secondary);
+   outline: none;
+   appearance: none;
+}
+
+.volumeSlider::-webkit-slider-thumb {
+   -webkit-appearance: none;
+   appearance: none;
+   width: 16px;
+   height: 16px;
+   border-radius: 50%;
+   background: var(--primary-green);
+   cursor: pointer;
+}
+
+.volumeSlider::-moz-range-thumb {
+   width: 16px;
+   height: 16px;
+   border-radius: 50%;
+   background: var(--primary-green);
+   cursor: pointer;
+   border: none;
+}
+
+.select {
+   padding: var(--space-sm) var(--space-md);
+   border: 1px solid var(--border-color);
+   border-radius: var(--radius-sm);
+   background: var(--surface);
+   color: var(--text-primary);
+   font-size: 0.9rem;
+}
+
+@media (min-width: 1024px) {
+   .profileView {
+      padding: 40px;
+      padding-bottom: 100px;
+   }
+}

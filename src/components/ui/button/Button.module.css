@@ -1,0 +1,51 @@
+/* src/components/ui/Button/Button.module.css */
+.button {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   gap: var(--space-sm);
+   padding: var(--space-md) var(--space-lg);
+   border: none;
+   border-radius: var(--radius-sm);
+   font-weight: 600;
+   font-size: 0.95rem;
+   cursor: pointer;
+   transition: all var(--transition-fast);
+   flex: 1;
+   min-width: 140px;
+}
+
+.primary {
+   background: var(--primary-green);
+   color: white;
+}
+
+.primary:hover:not(:disabled) {
+   background: #27ae60;
+   transform: translateY(-1px);
+}
+
+.secondary {
+   background: transparent;
+   color: var(--secondary-blue);
+   border: 2px solid var(--secondary-blue);
+}
+
+.secondary:hover:not(:disabled) {
+   background: var(--secondary-blue);
+   color: white;
+}
+
+.locked {
+   background: #95a5a6;
+   color: white;
+}
+
+.locked:hover:not(:disabled) {
+   background: #7f8c8d;
+}
+
+.button:disabled {
+   cursor: not-allowed;
+   opacity: 0.6;
+}
