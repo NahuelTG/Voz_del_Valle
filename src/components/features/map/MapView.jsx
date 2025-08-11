@@ -1,7 +1,10 @@
 // src/components/features/map/MapView.jsx
 import { useRef, useEffect } from "react";
 import PropTypes from "prop-types";
+import "mapbox-gl/dist/mapbox-gl.css";
+
 import { useMapbox } from "../../../hooks/useMapbox";
+
 import styles from "./MapView.module.css";
 
 const ROUTE_MARKERS = [
@@ -82,8 +85,7 @@ const MapView = () => {
       });
 
       addMarkers(mapboxMarkers);
-      setTimeout(fitToMarkers, 500);
-   }, [isReady, addMarkers, fitToMarkers]);
+   }, [isReady, addMarkers]);
 
    if (error) {
       return (
@@ -91,6 +93,7 @@ const MapView = () => {
             <div className={styles.mapPlaceholder}>
                <div className={styles.fallbackMessage}>
                   <h3>🗺️ Vista básica</h3>
+                  <p>{error}</p>
                </div>
                {ROUTE_MARKERS.map((marker) => (
                   <FallbackMarker key={marker.id} marker={marker} />
@@ -100,34 +103,35 @@ const MapView = () => {
       );
    }
 
-   if (!isReady) {
-      return (
-         <div className={styles.mapView}>
-            <div className={styles.loadingContainer}>
-               <div className={styles.spinner}></div>
-               <p>Cargando...</p>
-            </div>
-         </div>
-      );
-   }
-
    return (
       <div className={styles.mapView}>
-         <div ref={mapContainer} className={styles.mapContainer} />
+         <div ref={mapContainer} className={styles.mapContainer} style={{ width: "100%", height: "100%" }} />
 
-         <div className={styles.mapControls}>
-            {userLocation && (
-               <button className={styles.controlButton} onClick={goToUser}>
-                  📍
+         {!isReady && (
+            <div className={styles.loadingOverlay}>
+               <div className={styles.loadingContainer}>
+                  <div className={styles.spinner}></div>
+                  <p>Cargando mapa...</p>
+                  <small>Obteniendo tu ubicación...</small>
+               </div>
+            </div>
+         )}
+
+         {isReady && (
+            <div className={styles.mapControls}>
+               {userLocation && (
+                  <button className={styles.controlButton} onClick={goToUser}>
+                     📍
+                  </button>
+               )}
+               <button className={styles.controlButton} onClick={fitToMarkers}>
+                  🎯
                </button>
-            )}
-            <button className={styles.controlButton} onClick={fitToMarkers}>
-               🎯
-            </button>
-            <button className={styles.controlButton} onClick={() => setStyle("mapbox://styles/mapbox/satellite-v9")}>
-               🛰️
-            </button>
-         </div>
+               <button className={styles.controlButton} onClick={() => setStyle("mapbox://styles/mapbox/satellite-v9")}>
+                  🛰️
+               </button>
+            </div>
+         )}
       </div>
    );
 };

@@ -1,4 +1,4 @@
-// src/hooks/useMapbox.js
+// src/hooks/useMapbox.js - VERSIÓN CORREGIDA
 import { useEffect, useState, useRef, useCallback } from "react";
 import mapboxgl from "mapbox-gl";
 
@@ -17,9 +17,16 @@ export const useMapbox = (containerRef) => {
          (position) => {
             const location = [position.coords.longitude, position.coords.latitude];
             setUserLocation(location);
+
+            if (map.current) {
+               map.current.flyTo({ center: location, zoom: 15 });
+            }
          },
-         () => setUserLocation(null),
-         { timeout: 5000 }
+         (error) => {
+            console.warn("No se pudo obtener la ubicación:", error.message);
+            setUserLocation(null);
+         },
+         { timeout: 10000, enableHighAccuracy: true }
       );
    }, []);
 
@@ -31,15 +38,15 @@ export const useMapbox = (containerRef) => {
          return;
       }
 
-      if (map.current || !containerRef.current) return;
+      if (map.current) return;
 
       mapboxgl.accessToken = token;
 
       map.current = new mapboxgl.Map({
          container: containerRef.current,
          style: "mapbox://styles/mapbox/streets-v12",
-         center: [0, 0],
-         zoom: 2,
+         center: [-66.1568, -17.3895],
+         zoom: 12,
       });
 
       map.current.on("load", () => {
@@ -47,10 +54,16 @@ export const useMapbox = (containerRef) => {
          getUserLocation();
       });
 
+      map.current.on("error", (e) => {
+         console.error("Error del mapa:", e);
+         setError("Error al cargar el mapa");
+      });
+
       return () => {
          if (map.current) {
             map.current.remove();
             map.current = null;
+            setIsReady(false);
          }
       };
    }, [containerRef, getUserLocation]);
@@ -81,7 +94,10 @@ export const useMapbox = (containerRef) => {
       const coordinates = markers.current.map((m) => m.getLngLat());
 
       if (coordinates.length === 1) {
-         map.current.flyTo({ center: [coordinates[0].lng, coordinates[0].lat], zoom: 14 });
+         map.current.flyTo({
+            center: [coordinates[0].lng, coordinates[0].lat],
+            zoom: 14,
+         });
       } else {
          const bounds = new mapboxgl.LngLatBounds();
          coordinates.forEach((coord) => bounds.extend(coord));
@@ -92,11 +108,15 @@ export const useMapbox = (containerRef) => {
    const goToUser = useCallback(() => {
       if (userLocation && map.current) {
          map.current.flyTo({ center: userLocation, zoom: 15 });
+      } else {
+         getUserLocation();
       }
-   }, [userLocation]);
+   }, [userLocation, getUserLocation]);
 
    const setStyle = useCallback((style) => {
-      if (map.current) map.current.setStyle(style);
+      if (map.current) {
+         map.current.setStyle(style);
+      }
    }, []);
 
    return {
