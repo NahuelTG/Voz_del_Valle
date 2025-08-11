@@ -64,7 +64,11 @@ export const useMapbox = (containerRef) => {
          markersArray.forEach((data) => {
             const marker = new mapboxgl.Marker(data.element).setLngLat(data.coordinates).addTo(map.current);
 
-            if (data.popup) marker.setPopup(data.popup);
+            if (data.popupContent) {
+               const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(data.popupContent);
+               marker.setPopup(popup);
+            }
+
             markers.current.push(marker);
          });
       },
