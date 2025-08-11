@@ -12,7 +12,10 @@
   "dependencies": {
     "mapbox-gl": "^3.14.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "mind-ar": "^1.2.5",
+    "three": "^0.150.0",
+    "aframe": "^1.7.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.18.0",
