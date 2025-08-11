@@ -2,8 +2,8 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 
-import Modal from "../../ui/Modal/Modal";
-import Button from "../../ui/Button/Button";
+import Modal from "../../ui/modal/Modal.jsx";
+import Button from "../../ui/button/Button.jsx";
 
 import styles from "./CodeModal.module.css";
 
