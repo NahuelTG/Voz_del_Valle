@@ -1,8 +1,9 @@
 // CameraAppMindAR.jsx - Usando sistema modular
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router";
+
 import useMindarThree from "../hooks/useMindarThree.js";
-import { ARModelFactory } from "../models/ARModelFactory.js";
+import { ARModelFactory } from "../../../models/ARModelFactory.js";
 
 function CameraAppMindAR() {
    const navigate = useNavigate();
@@ -33,7 +34,7 @@ function CameraAppMindAR() {
       savePhoto,
       quickSaveAR,
       triggerModelAction,
-   } = useMindarThree(wolfModel, "/assets/AR/wolf.mind");
+   } = useMindarThree(wolfModel, "/assets/models/wolf/wolf.mind");
 
    const handleBackHome = () => {
       navigate("/");

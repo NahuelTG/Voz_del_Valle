@@ -12,7 +12,6 @@ const ROUTE_MARKERS = [
       id: 1,
       name: "Ruta Sonora",
       coordinates: [-66.1568, -17.3895],
-      position: { top: "30%", left: "40%" },
       icon: "🎵",
       unlocked: true,
    },
@@ -20,7 +19,6 @@ const ROUTE_MARKERS = [
       id: 2,
       name: "Caminos de Memoria",
       coordinates: [-66.1468, -17.3795],
-      position: { top: "60%", left: "70%" },
       icon: "🔒",
       unlocked: false,
    },
@@ -28,9 +26,15 @@ const ROUTE_MARKERS = [
       id: 3,
       name: "Ecos del Pasado",
       coordinates: [-66.1668, -17.3995],
-      position: { top: "45%", left: "25%" },
       icon: "🔒",
       unlocked: false,
+   },
+   {
+      id: 4,
+      name: "Lobo del Valle",
+      coordinates: [-66.1668, -17.3695],
+      icon: "AR",
+      unlocked: true,
    },
 ];
 

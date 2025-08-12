@@ -20,7 +20,7 @@ export class WolfARModel extends ARModelBase {
       };
 
       super(wolfConfig);
-      this.modelPath = "/assets/AR/wolf.glb";
+      this.modelPath = "/assets/models/wolf/wolf.glb";
    }
 
    async load() {
