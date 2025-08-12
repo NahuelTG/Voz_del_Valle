@@ -1,12 +1,41 @@
-/* src/App.module.css */
+/* src/App.module.css - Refactorizado */
 .app {
    position: relative;
    width: 100vw;
    height: 100dvh;
    overflow: hidden;
-   transition: all var(--transition-normal);
 }
 
+/* Contenedor del mapa - siempre visible en el fondo */
+.mapContainer {
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   z-index: 1;
+}
+
+/* Overlay para las otras vistas */
+.overlayView {
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   z-index: 50;
+   animation: slideIn 0.3s ease-out;
+}
+
+.overlayContent {
+   width: 100%;
+   height: 100%;
+   background: var(--bg-primary);
+   overflow-y: auto;
+   -webkit-overflow-scrolling: touch;
+}
+
+/* Overlay para cerrar modales */
 .overlay {
    position: fixed;
    top: 0;
@@ -14,6 +43,40 @@
    width: 100%;
    height: 100%;
    background: rgba(0, 0, 0, 0.5);
-   z-index: 998;
+   z-index: 150;
    transition: opacity var(--transition-normal);
+   backdrop-filter: blur(2px);
+}
+
+/* Animaciones */
+@keyframes slideIn {
+   from {
+      transform: translateY(100%);
+      opacity: 0;
+   }
+   to {
+      transform: translateY(0);
+      opacity: 1;
+   }
+}
+
+/* Modo oscuro */
+[data-theme="dark"] .overlayContent {
+   background: var(--bg-primary);
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+   .overlayView {
+      animation: fadeIn 0.3s ease-out;
+   }
+
+   @keyframes fadeIn {
+      from {
+         opacity: 0;
+      }
+      to {
+         opacity: 1;
+      }
+   }
 }

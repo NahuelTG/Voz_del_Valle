@@ -1,5 +1,5 @@
-// src/App.jsx
-import { useState } from "react";
+// src/App.jsx - Refactorizado
+import { useState, useRef } from "react";
 import { useTheme } from "./hooks/useTheme";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 
@@ -26,6 +26,9 @@ const App = () => {
    const [currentView, setCurrentView] = useState(VIEWS.MAP);
    const [showCodeModal, setShowCodeModal] = useState(false);
 
+   // Ref para mantener el estado del mapa
+   const mapRef = useRef(null);
+
    const enrichedRoutes = ROUTES_DATA.map((route) => ({
       ...route,
       isUnlocked: unlockedRoutes.includes(route.id),
@@ -47,27 +50,43 @@ const App = () => {
       return false;
    };
 
-   const renderCurrentView = () => {
-      const viewProps = { theme };
+   const handleViewChange = (view) => {
+      setCurrentView(view);
+      setIsSidebarOpen(false);
+      setSelectedRoute(null);
+   };
 
-      switch (currentView) {
-         case VIEWS.ROUTES:
-            return <RoutesView routes={enrichedRoutes} onRouteSelect={handleRouteSelect} {...viewProps} />;
-         case VIEWS.ADVENTURES:
-            return <AdventuresView routes={enrichedRoutes.filter((r) => r.isUnlocked)} achievements={ACHIEVEMENTS_DATA} {...viewProps} />;
-         case VIEWS.PROFILE:
-            return <ProfileView theme={theme} onToggleTheme={toggleTheme} onShowCodeModal={() => setShowCodeModal(true)} {...viewProps} />;
-         default:
-            return <MapView {...viewProps} />;
-      }
+   const handleCloseOverlays = () => {
+      setIsSidebarOpen(false);
+      setSelectedRoute(null);
    };
 
    return (
       <div className={styles.app}>
-         {renderCurrentView()}
+         {/* El mapa siempre está renderizado en el fondo */}
+         <div className={styles.mapContainer}>
+            <MapView ref={mapRef} theme={theme} />
+         </div>
 
+         {/* Overlay Views - Solo se muestran cuando no es MAP */}
+         {currentView !== VIEWS.MAP && (
+            <div className={styles.overlayView}>
+               <div className={styles.overlayContent}>
+                  {currentView === VIEWS.ROUTES && <RoutesView routes={enrichedRoutes} onRouteSelect={handleRouteSelect} theme={theme} />}
+                  {currentView === VIEWS.ADVENTURES && (
+                     <AdventuresView routes={enrichedRoutes.filter((r) => r.isUnlocked)} achievements={ACHIEVEMENTS_DATA} theme={theme} />
+                  )}
+                  {currentView === VIEWS.PROFILE && (
+                     <ProfileView theme={theme} onToggleTheme={toggleTheme} onShowCodeModal={() => setShowCodeModal(true)} />
+                  )}
+               </div>
+            </div>
+         )}
+
+         {/* Menu Button - Solo visible en vista MAP */}
          {currentView === VIEWS.MAP && <MenuButton onClick={() => setIsSidebarOpen(!isSidebarOpen)} isOpen={isSidebarOpen} />}
 
+         {/* Sidebar */}
          <Sidebar
             isOpen={isSidebarOpen}
             onClose={() => setIsSidebarOpen(false)}
@@ -75,6 +94,7 @@ const App = () => {
             onRouteSelect={handleRouteSelect}
          />
 
+         {/* Route Slider */}
          {selectedRoute && (
             <EnhancedRouteSlider
                route={selectedRoute}
@@ -83,11 +103,14 @@ const App = () => {
             />
          )}
 
-         <BottomNavigation currentView={currentView} onViewChange={setCurrentView} />
+         {/* Bottom Navigation */}
+         <BottomNavigation currentView={currentView} onViewChange={handleViewChange} />
 
+         {/* Code Modal */}
          <CodeModal isOpen={showCodeModal} onClose={() => setShowCodeModal(false)} onUnlock={handleUnlockRoute} />
 
-         {isSidebarOpen && <div className={styles.overlay} onClick={() => setIsSidebarOpen(false)} />}
+         {/* Overlay para cerrar sidebar */}
+         {(isSidebarOpen || selectedRoute) && <div className={styles.overlay} onClick={handleCloseOverlays} />}
       </div>
    );
 };
