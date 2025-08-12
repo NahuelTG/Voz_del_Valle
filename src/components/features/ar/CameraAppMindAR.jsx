@@ -13,7 +13,7 @@ function CameraAppMindAR() {
    const wolfModel = useMemo(() => {
       return ARModelFactory.createModel("wolf", {
          // 🐺 Configuraciones específicas para este lobo
-         scale: { x: 0.12, y: 0.12, z: 0.12 },
+         scale: { x: 1, y: 1, z: 1 },
          position: { x: 0, y: -0.25, z: 0 },
          rotation: { x: 0, y: Math.PI * 0.8, z: 0 },
          animationSpeed: 1.5,
