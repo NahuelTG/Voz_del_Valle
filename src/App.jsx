@@ -1,5 +1,6 @@
-// src/App.jsx - Refactorizado
+// src/App.jsx - Con React Router
 import { useState, useRef } from "react";
+import { Routes, Route } from "react-router";
 import { useTheme } from "./hooks/useTheme";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 
@@ -12,12 +13,14 @@ import BottomNavigation from "./components/layout/BottomNavigation/BottomNavigat
 import MenuButton from "./components/layout/MenuButton/MenuButton";
 import EnhancedRouteSlider from "./components/features/routes/EnhancedRouteSlider";
 import CodeModal from "./components/features/code/CodeModal";
+import CameraAppMindAR from "./components/features/ar/CameraAppMindAR";
 
 import { VIEWS, ROUTES_DATA, ACHIEVEMENTS_DATA } from "./utils/constants";
 
 import styles from "./App.module.css";
 
-const App = () => {
+// Componente principal de la app
+const MainApp = () => {
    const { theme, toggleTheme } = useTheme();
    const [unlockedRoutes, setUnlockedRoutes] = useLocalStorage("unlockedRoutes", [1]);
 
@@ -112,6 +115,16 @@ const App = () => {
          {/* Overlay para cerrar sidebar */}
          {(isSidebarOpen || selectedRoute) && <div className={styles.overlay} onClick={handleCloseOverlays} />}
       </div>
+   );
+};
+
+// App principal con rutas
+const App = () => {
+   return (
+      <Routes>
+         <Route path="/" element={<MainApp />} />
+         <Route path="/ar/lobo" element={<CameraAppMindAR />} />
+      </Routes>
    );
 };
 

@@ -1,8 +1,8 @@
-// CameraAppMindAR.jsx - Usando sistema modular
+// CameraAppMindAR.jsx - Con navegación mejorada
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router";
 
-import useMindarThree from "../hooks/useMindarThree.js";
+import useMindarThree from "../../../hooks/useMindarThree.js";
 import { ARModelFactory } from "../../../models/ARModelFactory.js";
 
 function CameraAppMindAR() {
@@ -86,7 +86,7 @@ function CameraAppMindAR() {
          <div
             style={{
                width: "100vw",
-               height: "100vh",
+               height: "100dvh",
                display: "flex",
                flexDirection: "column",
                alignItems: "center",
@@ -127,7 +127,7 @@ function CameraAppMindAR() {
                   marginTop: "10px",
                }}
             >
-               ← Volver
+               ← Volver al Mapa
             </button>
          </div>
       );
@@ -138,7 +138,7 @@ function CameraAppMindAR() {
          ref={sceneRef}
          style={{
             width: "100vw",
-            height: "100vh",
+            height: "100dvh",
             position: "absolute",
             top: 0,
             left: 0,
@@ -164,26 +164,26 @@ function CameraAppMindAR() {
                   fontFamily: "system-ui, Avenir, Helvetica, Arial, sans-serif",
                }}
             >
-               <svg
-                  aria-hidden="true"
-                  style={{ width: "60px", height: "60px", marginBottom: "24px", color: "#EAB308" }}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-               >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                  <animateTransform
-                     attributeName="transform"
-                     type="rotate"
-                     from="0 12 12"
-                     to="360 12 12"
-                     dur="1.2s"
-                     repeatCount="indefinite"
-                  />
-               </svg>
-               <p style={{ fontSize: "1.3em", fontWeight: "600", marginBottom: "12px" }}>Cargando Lobo AR Modular...</p>
-               <p style={{ fontSize: "1em", color: "#D1D5DB" }}>Configurando modelo personalizado...</p>
+               <div
+                  style={{
+                     width: "60px",
+                     height: "60px",
+                     marginBottom: "24px",
+                     border: "4px solid #EAB308",
+                     borderTop: "4px solid transparent",
+                     borderRadius: "50%",
+                     animation: "spin 1s linear infinite",
+                  }}
+               />
+               <p style={{ fontSize: "1.3em", fontWeight: "600", marginBottom: "12px" }}>🐺 Cargando Lobo AR...</p>
+               <p style={{ fontSize: "1em", color: "#D1D5DB" }}>Configurando modelo del valle...</p>
+
+               <style>{`
+                  @keyframes spin {
+                     0% { transform: rotate(0deg); }
+                     100% { transform: rotate(360deg); }
+                  }
+               `}</style>
             </div>
          )}
 
@@ -216,7 +216,7 @@ function CameraAppMindAR() {
                         backdropFilter: "blur(10px)",
                      }}
                   >
-                     ← Atrás
+                     ← Volver al Mapa
                   </button>
 
                   {/* 🎬 Botón para hacer aullar al lobo */}
@@ -342,7 +342,7 @@ function CameraAppMindAR() {
                >
                   <p style={{ margin: 0, fontSize: "16px" }}>
                      {isTracking
-                        ? "🎉 ¡Lobo AR modular activo! Toca 'Aullar' para interactuar"
+                        ? "🎉 ¡Lobo del Valle activo! Toca 'Aullar' para interactuar"
                         : "📱 Apunta la cámara al target para activar el lobo AR"}
                   </p>
                </div>
@@ -370,7 +370,7 @@ function CameraAppMindAR() {
                   padding: "20px",
                }}
             >
-               <h3 style={{ color: "white", marginBottom: "20px", fontSize: "24px" }}>🐺 Foto AR del Lobo Modular Capturada</h3>
+               <h3 style={{ color: "white", marginBottom: "20px", fontSize: "24px" }}>🐺 Foto del Lobo del Valle</h3>
 
                <img
                   src={capturedPhoto}
