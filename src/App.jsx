@@ -1,5 +1,6 @@
-// src/App.jsx
-import { useState } from "react";
+// src/App.jsx - Con React Router
+import { useState, useRef } from "react";
+import { Routes, Route } from "react-router";
 import { useTheme } from "./hooks/useTheme";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 
@@ -12,12 +13,14 @@ import BottomNavigation from "./components/layout/BottomNavigation/BottomNavigat
 import MenuButton from "./components/layout/MenuButton/MenuButton";
 import EnhancedRouteSlider from "./components/features/routes/EnhancedRouteSlider";
 import CodeModal from "./components/features/code/CodeModal";
+import CameraAppMindAR from "./components/features/ar/CameraAppMindAR";
 
 import { VIEWS, ROUTES_DATA, ACHIEVEMENTS_DATA } from "./utils/constants";
 
 import styles from "./App.module.css";
 
-const App = () => {
+// Componente principal de la app
+const MainApp = () => {
    const { theme, toggleTheme } = useTheme();
    const [unlockedRoutes, setUnlockedRoutes] = useLocalStorage("unlockedRoutes", [1]);
 
@@ -25,6 +28,9 @@ const App = () => {
    const [selectedRoute, setSelectedRoute] = useState(null);
    const [currentView, setCurrentView] = useState(VIEWS.MAP);
    const [showCodeModal, setShowCodeModal] = useState(false);
+
+   // Ref para mantener el estado del mapa
+   const mapRef = useRef(null);
 
    const enrichedRoutes = ROUTES_DATA.map((route) => ({
       ...route,
@@ -47,27 +53,43 @@ const App = () => {
       return false;
    };
 
-   const renderCurrentView = () => {
-      const viewProps = { theme };
+   const handleViewChange = (view) => {
+      setCurrentView(view);
+      setIsSidebarOpen(false);
+      setSelectedRoute(null);
+   };
 
-      switch (currentView) {
-         case VIEWS.ROUTES:
-            return <RoutesView routes={enrichedRoutes} onRouteSelect={handleRouteSelect} {...viewProps} />;
-         case VIEWS.ADVENTURES:
-            return <AdventuresView routes={enrichedRoutes.filter((r) => r.isUnlocked)} achievements={ACHIEVEMENTS_DATA} {...viewProps} />;
-         case VIEWS.PROFILE:
-            return <ProfileView theme={theme} onToggleTheme={toggleTheme} onShowCodeModal={() => setShowCodeModal(true)} {...viewProps} />;
-         default:
-            return <MapView {...viewProps} />;
-      }
+   const handleCloseOverlays = () => {
+      setIsSidebarOpen(false);
+      setSelectedRoute(null);
    };
 
    return (
       <div className={styles.app}>
-         {renderCurrentView()}
+         {/* El mapa siempre está renderizado en el fondo */}
+         <div className={styles.mapContainer}>
+            <MapView ref={mapRef} theme={theme} />
+         </div>
 
+         {/* Overlay Views - Solo se muestran cuando no es MAP */}
+         {currentView !== VIEWS.MAP && (
+            <div className={styles.overlayView}>
+               <div className={styles.overlayContent}>
+                  {currentView === VIEWS.ROUTES && <RoutesView routes={enrichedRoutes} onRouteSelect={handleRouteSelect} theme={theme} />}
+                  {currentView === VIEWS.ADVENTURES && (
+                     <AdventuresView routes={enrichedRoutes.filter((r) => r.isUnlocked)} achievements={ACHIEVEMENTS_DATA} theme={theme} />
+                  )}
+                  {currentView === VIEWS.PROFILE && (
+                     <ProfileView theme={theme} onToggleTheme={toggleTheme} onShowCodeModal={() => setShowCodeModal(true)} />
+                  )}
+               </div>
+            </div>
+         )}
+
+         {/* Menu Button - Solo visible en vista MAP */}
          {currentView === VIEWS.MAP && <MenuButton onClick={() => setIsSidebarOpen(!isSidebarOpen)} isOpen={isSidebarOpen} />}
 
+         {/* Sidebar */}
          <Sidebar
             isOpen={isSidebarOpen}
             onClose={() => setIsSidebarOpen(false)}
@@ -75,6 +97,7 @@ const App = () => {
             onRouteSelect={handleRouteSelect}
          />
 
+         {/* Route Slider */}
          {selectedRoute && (
             <EnhancedRouteSlider
                route={selectedRoute}
@@ -83,12 +106,25 @@ const App = () => {
             />
          )}
 
-         <BottomNavigation currentView={currentView} onViewChange={setCurrentView} />
+         {/* Bottom Navigation */}
+         <BottomNavigation currentView={currentView} onViewChange={handleViewChange} />
 
+         {/* Code Modal */}
          <CodeModal isOpen={showCodeModal} onClose={() => setShowCodeModal(false)} onUnlock={handleUnlockRoute} />
 
-         {isSidebarOpen && <div className={styles.overlay} onClick={() => setIsSidebarOpen(false)} />}
+         {/* Overlay para cerrar sidebar */}
+         {(isSidebarOpen || selectedRoute) && <div className={styles.overlay} onClick={handleCloseOverlays} />}
       </div>
+   );
+};
+
+// App principal con rutas
+const App = () => {
+   return (
+      <Routes>
+         <Route path="/" element={<MainApp />} />
+         <Route path="/ar/lobo" element={<CameraAppMindAR />} />
+      </Routes>
    );
 };
 
