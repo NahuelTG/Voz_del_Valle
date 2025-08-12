@@ -137,7 +137,7 @@ export default defineConfig({
                three: ["three"],
                mindar: ["mind-ar"],
                "react-vendor": ["react", "react-dom"],
-               router: ["react-router-dom"],
+               router: ["react-router"],
                mapbox: ["mapbox-gl"],
             },
          },
