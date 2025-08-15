@@ -33,17 +33,14 @@ export default defineConfig({
          },
 
          workbox: {
-            // 🔧 SOLUCIÓN: Aumentar el límite de tamaño de archivos
-            maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10 MB
+            maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
 
             globPatterns: ["**/*.{js,css,html,svg,png,ico}"],
             cleanupOutdatedCaches: true,
             clientsClaim: true,
             skipWaiting: true,
 
-            // 📦 Estrategias de caché para diferentes tipos de archivos
             runtimeCaching: [
-               // Mapbox tiles y API
                {
                   urlPattern: /^https:\/\/api\.mapbox\.com/,
                   handler: "CacheFirst",
@@ -51,11 +48,11 @@ export default defineConfig({
                      cacheName: "mapbox-cache",
                      expiration: {
                         maxEntries: 100,
-                        maxAgeSeconds: 60 * 60 * 24 * 30, // 30 días
+                        maxAgeSeconds: 60 * 60 * 24 * 30,
                      },
                   },
                },
-               // Modelos 3D y archivos AR
+
                {
                   urlPattern: /\.(?:glb|gltf|mind)$/,
                   handler: "CacheFirst",
@@ -63,11 +60,11 @@ export default defineConfig({
                      cacheName: "ar-models-cache",
                      expiration: {
                         maxEntries: 20,
-                        maxAgeSeconds: 60 * 60 * 24 * 90, // 90 días
+                        maxAgeSeconds: 60 * 60 * 24 * 90,
                      },
                   },
                },
-               // Imágenes
+
                {
                   urlPattern: /\.(?:png|jpg|jpeg|svg|webp)$/,
                   handler: "CacheFirst",
@@ -75,11 +72,11 @@ export default defineConfig({
                      cacheName: "images-cache",
                      expiration: {
                         maxEntries: 100,
-                        maxAgeSeconds: 60 * 60 * 24 * 30, // 30 días
+                        maxAgeSeconds: 60 * 60 * 24 * 30,
                      },
                   },
                },
-               // JavaScript chunks (para lazy loading)
+
                {
                   urlPattern: /\.js$/,
                   handler: "StaleWhileRevalidate",
@@ -87,18 +84,10 @@ export default defineConfig({
                      cacheName: "js-cache",
                      expiration: {
                         maxEntries: 50,
-                        maxAgeSeconds: 60 * 60 * 24 * 7, // 7 días
+                        maxAgeSeconds: 60 * 60 * 24 * 7,
                      },
                   },
                },
-            ],
-
-            // 🚫 Archivos a ignorar del precaching
-            globIgnores: [
-               "**/node_modules/**/*",
-               // Opcional: excluir chunks muy grandes del precaching inicial
-               // '**/assets/three-*.js',
-               // '**/assets/mindar-*.js',
             ],
          },
 
@@ -124,16 +113,12 @@ export default defineConfig({
       },
    },
 
-   // 🏗️ Optimizaciones de build para reducir tamaño
    build: {
-      // Aumentar límite de advertencia
       chunkSizeWarningLimit: 1000,
 
       rollupOptions: {
          output: {
-            // 📦 Code splitting para dividir el bundle grande
             manualChunks: {
-               // Separar librerías pesadas
                three: ["three"],
                mindar: ["mind-ar"],
                "react-vendor": ["react", "react-dom"],
@@ -143,18 +128,12 @@ export default defineConfig({
          },
       },
 
-      // 🗜️ Minificación optimizada
       minify: "terser",
       terserOptions: {
          compress: {
-            drop_console: true, // Eliminar console.log en producción
+            drop_console: true,
             drop_debugger: true,
          },
       },
-   },
-
-   // 🚀 Optimizaciones adicionales
-   define: {
-      "process.env.NODE_ENV": JSON.stringify("production"),
    },
 });
