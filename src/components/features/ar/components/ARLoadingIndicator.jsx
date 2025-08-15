@@ -1,4 +1,6 @@
 // components/ARLoadingIndicator.js
+import PropTypes from "prop-types";
+
 const ARLoadingIndicator = ({ isReady }) => {
    if (isReady) return null;
 
@@ -21,6 +23,10 @@ const ARLoadingIndicator = ({ isReady }) => {
          Cargando WebXR...
       </div>
    );
+};
+
+ARLoadingIndicator.propTypes = {
+   isReady: PropTypes.bool.isRequired,
 };
 
 export default ARLoadingIndicator;
