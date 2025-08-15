@@ -13,7 +13,7 @@ import BottomNavigation from "./components/layout/BottomNavigation/BottomNavigat
 import MenuButton from "./components/layout/MenuButton/MenuButton";
 import EnhancedRouteSlider from "./components/features/routes/EnhancedRouteSlider";
 import CodeModal from "./components/features/code/CodeModal";
-import CameraAppMindAR from "./components/features/ar/CameraAppMindAR";
+import CameraWebXR from "./components/features/ar/CameraWebXR";
 
 import { VIEWS, ROUTES_DATA, ACHIEVEMENTS_DATA } from "./utils/constants";
 
@@ -123,7 +123,7 @@ const App = () => {
    return (
       <Routes>
          <Route path="/" element={<MainApp />} />
-         <Route path="/ar/lobo" element={<CameraAppMindAR />} />
+         <Route path="/ar/lobo" element={<CameraWebXR />} />
       </Routes>
    );
 };
