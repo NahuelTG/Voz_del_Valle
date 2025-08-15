@@ -1,10 +1,11 @@
-// components/ARControls.js
+// components/ARWolfControls.jsx
 import PropTypes from "prop-types";
-const ARControls = ({ surfaceDetected, cubeCount, onAddCube, onRemoveLastCube, onRemoveAllCubes, onExit }) => {
+
+const ARWolfControls = ({ surfaceDetected, hasWolf, onAddWolf, onRemoveWolf, onTriggerHowl, onExit }) => {
    return (
       <>
-         {/* Contador de cubos */}
-         {cubeCount > 0 && (
+         {/* Indicador de lobo presente */}
+         {hasWolf && (
             <div
                style={{
                   position: "absolute",
@@ -20,7 +21,7 @@ const ARControls = ({ surfaceDetected, cubeCount, onAddCube, onRemoveLastCube, o
                   pointerEvents: "auto",
                }}
             >
-               📦 {cubeCount}
+               🐺 Lobo Único Activo
             </div>
          )}
 
@@ -58,33 +59,36 @@ const ARControls = ({ surfaceDetected, cubeCount, onAddCube, onRemoveLastCube, o
                pointerEvents: "auto",
             }}
          >
-            {/* Botón añadir cubo */}
-            <button
-               onClick={onAddCube}
-               disabled={!surfaceDetected}
-               style={{
-                  width: "60px",
-                  height: "60px",
-                  borderRadius: "50%",
-                  background: surfaceDetected ? "rgba(0, 255, 136, 0.9)" : "rgba(100, 100, 100, 0.6)",
-                  border: `3px solid ${surfaceDetected ? "#00ff88" : "#666"}`,
-                  color: "white",
-                  fontSize: "24px",
-                  cursor: surfaceDetected ? "pointer" : "not-allowed",
-                  fontWeight: "bold",
-                  boxShadow: "0 4px 15px rgba(0,0,0,0.5)",
-               }}
-            >
-               ➕
-            </button>
-
-            {/* Botón quitar último */}
-            {cubeCount > 0 && (
+            {/* Botón colocar lobo - Solo si no hay lobo */}
+            {!hasWolf && (
                <button
-                  onClick={onRemoveLastCube}
+                  onClick={onAddWolf}
+                  disabled={!surfaceDetected}
                   style={{
-                     width: "50px",
-                     height: "50px",
+                     width: "70px",
+                     height: "70px",
+                     borderRadius: "50%",
+                     background: surfaceDetected ? "rgba(0, 255, 136, 0.9)" : "rgba(100, 100, 100, 0.6)",
+                     border: `3px solid ${surfaceDetected ? "#00ff88" : "#666"}`,
+                     color: "white",
+                     fontSize: "24px",
+                     cursor: surfaceDetected ? "pointer" : "not-allowed",
+                     fontWeight: "bold",
+                     boxShadow: "0 4px 15px rgba(0,0,0,0.5)",
+                  }}
+                  title="Colocar lobo único"
+               >
+                  🐺
+               </button>
+            )}
+
+            {/* Botón hacer aullar - Solo si hay lobo */}
+            {hasWolf && (
+               <button
+                  onClick={onTriggerHowl}
+                  style={{
+                     width: "60px",
+                     height: "60px",
                      borderRadius: "50%",
                      background: "rgba(255, 136, 0, 0.9)",
                      border: "3px solid #ff8800",
@@ -95,14 +99,14 @@ const ARControls = ({ surfaceDetected, cubeCount, onAddCube, onRemoveLastCube, o
                      boxShadow: "0 4px 15px rgba(0,0,0,0.5)",
                   }}
                >
-                  ↶
+                  🎵
                </button>
             )}
 
-            {/* Botón limpiar todos */}
-            {cubeCount > 0 && (
+            {/* Botón remover el lobo - Solo si hay lobo */}
+            {hasWolf && (
                <button
-                  onClick={onRemoveAllCubes}
+                  onClick={onRemoveWolf}
                   style={{
                      width: "50px",
                      height: "50px",
@@ -115,6 +119,7 @@ const ARControls = ({ surfaceDetected, cubeCount, onAddCube, onRemoveLastCube, o
                      fontWeight: "bold",
                      boxShadow: "0 4px 15px rgba(0,0,0,0.5)",
                   }}
+                  title="Remover el lobo"
                >
                   🗑️
                </button>
@@ -124,13 +129,13 @@ const ARControls = ({ surfaceDetected, cubeCount, onAddCube, onRemoveLastCube, o
    );
 };
 
-ARControls.propTypes = {
+ARWolfControls.propTypes = {
    surfaceDetected: PropTypes.bool.isRequired,
-   cubeCount: PropTypes.number.isRequired,
-   onAddCube: PropTypes.func.isRequired,
-   onRemoveLastCube: PropTypes.func.isRequired,
-   onRemoveAllCubes: PropTypes.func.isRequired,
+   hasWolf: PropTypes.bool.isRequired,
+   onAddWolf: PropTypes.func.isRequired,
+   onRemoveWolf: PropTypes.func.isRequired,
+   onTriggerHowl: PropTypes.func.isRequired,
    onExit: PropTypes.func.isRequired,
 };
 
-export default ARControls;
+export default ARWolfControls;

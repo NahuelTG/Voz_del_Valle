@@ -1,4 +1,6 @@
 // components/ARErrorMessage.js
+import PropTypes from "prop-types";
+
 const ARErrorMessage = ({ isReady, isARSupported }) => {
    if (!isReady || isARSupported) return null;
 
@@ -24,6 +26,11 @@ const ARErrorMessage = ({ isReady, isARSupported }) => {
          <div style={{ fontSize: "14px", opacity: 0.8 }}>Necesitas un dispositivo Android con Chrome</div>
       </div>
    );
+};
+
+ARErrorMessage.propTypes = {
+   isReady: PropTypes.bool.isRequired,
+   isARSupported: PropTypes.bool.isRequired,
 };
 
 export default ARErrorMessage;

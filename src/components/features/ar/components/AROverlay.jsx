@@ -1,4 +1,6 @@
 // components/AROverlay.js
+import PropTypes from "prop-types";
+
 const AROverlay = ({ children }) => {
    return (
       <div
@@ -16,6 +18,10 @@ const AROverlay = ({ children }) => {
          {children}
       </div>
    );
+};
+
+AROverlay.propTypes = {
+   children: PropTypes.node,
 };
 
 export default AROverlay;
