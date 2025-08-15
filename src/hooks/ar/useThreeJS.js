@@ -1,4 +1,4 @@
-// hooks/useThreeJS.js
+// hooks/ar/useThreeJS.js
 import { useState, useEffect, useRef } from "react";
 import * as THREE from "three";
 
@@ -22,17 +22,21 @@ export const useThreeJS = (canvasRef) => {
             // Camera
             cameraRef.current = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
 
-            // Renderer
             rendererRef.current = new THREE.WebGLRenderer({
                canvas: canvasRef.current,
                antialias: true,
                alpha: true,
             });
+
             rendererRef.current.setPixelRatio(window.devicePixelRatio);
             rendererRef.current.setSize(window.innerWidth, window.innerHeight);
+
             rendererRef.current.xr.enabled = true;
+
             rendererRef.current.shadowMap.enabled = true;
             rendererRef.current.shadowMap.type = THREE.PCFSoftShadowMap;
+
+            rendererRef.current.autoClear = false;
 
             // Lighting
             const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1.5);

@@ -1,4 +1,4 @@
-// src/components/features/map/MapView.jsx
+// src/components/features/map/MapView.jsx - Con marcadores AR específicos
 import { useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router";
 import PropTypes from "prop-types";
@@ -8,6 +8,7 @@ import { useMapbox } from "../../../hooks/useMapbox";
 
 import styles from "./MapView.module.css";
 
+// Marcadores actualizados con diferentes tipos AR
 const ROUTE_MARKERS = [
    {
       id: 1,
@@ -18,10 +19,11 @@ const ROUTE_MARKERS = [
    },
    {
       id: 2,
-      name: "Duende",
+      name: "Lobo del Valle",
       coordinates: [-66.174238, -17.36632],
-      icon: "AR",
+      icon: "🐺",
       type: "ar",
+      arModel: "lobo", // ⭐ Tipo específico
       unlocked: true,
    },
    {
@@ -54,10 +56,11 @@ const ROUTE_MARKERS = [
    },
    {
       id: 7,
-      name: "Parque Fidel Anze",
+      name: "Duende Mágico",
       coordinates: [-66.152753, -17.370765],
-      icon: "AR",
+      icon: "🧚‍♂️",
       type: "ar",
+      arModel: "duende", // ⭐ Tipo específico
       unlocked: true,
    },
    {
@@ -69,15 +72,16 @@ const ROUTE_MARKERS = [
    },
    {
       id: 9,
-      name: "El puente",
+      name: "Murciélago Nocturno",
       coordinates: [-66.138117, -17.377397],
-      icon: "AR",
+      icon: "🦇",
       type: "ar",
+      arModel: "murcielago", // ⭐ Tipo específico
       unlocked: true,
    },
    {
       id: 10,
-      name: " Casa de Piedra",
+      name: "Casa de Piedra",
       coordinates: [-66.141846, -17.382329],
       icon: "🎵",
       unlocked: true,
@@ -97,6 +101,31 @@ const ROUTE_MARKERS = [
       unlocked: true,
    },
 ];
+
+// Función para obtener ruta AR según el modelo
+const getARRoute = (arModel) => {
+   const routes = {
+      lobo: "/ar/lobo",
+      wolf: "/ar/lobo",
+      duende: "/ar/duende",
+      gnome: "/ar/duende",
+      murcielago: "/ar/murcielago",
+      bat: "/ar/murcielago",
+   };
+
+   return routes[arModel.toLowerCase()] || "/ar/lobo";
+};
+
+// Función para obtener descripción del modelo AR
+const getARDescription = (arModel) => {
+   const descriptions = {
+      lobo: "🐺 Experimenta la realidad aumentada con el Lobo del Valle",
+      duende: "🧚‍♂️ Descubre la magia del Duende en AR",
+      murcielago: "🦇 Vuela con el Murciélago Nocturno en AR",
+   };
+
+   return descriptions[arModel.toLowerCase()] || "🎮 Experiencia de realidad aumentada";
+};
 
 const FallbackMarker = ({ marker }) => (
    <div className={styles.routeMarker} style={marker.position}>
@@ -126,7 +155,13 @@ const MapView = () => {
 
    const handleMarkerClick = useCallback(
       (marker) => {
-         if (marker.type === "ar" && marker.unlocked) {
+         if (marker.type === "ar" && marker.unlocked && marker.arModel) {
+            // Navegar a la ruta AR específica según el modelo
+            const arRoute = getARRoute(marker.arModel);
+            console.log(`🎮 Navegando a AR: ${marker.arModel} → ${arRoute}`);
+            navigate(arRoute);
+         } else if (marker.type === "ar" && marker.unlocked) {
+            // Fallback para marcadores AR sin modelo específico
             navigate("/ar/lobo");
          } else {
             console.log("Marcador clickeado:", marker.name);
@@ -143,6 +178,11 @@ const MapView = () => {
          element.className = styles.customMarker;
          element.style.cursor = marker.unlocked ? "pointer" : "default";
 
+         // Añadir clase específica para marcadores AR
+         if (marker.type === "ar") {
+            element.classList.add(styles.arMarker);
+         }
+
          element.innerHTML = `
             <div class="${styles.markerIcon} ${marker.unlocked ? styles.unlocked : styles.locked}">
                ${marker.icon}
@@ -153,13 +193,24 @@ const MapView = () => {
             element.addEventListener("click", () => handleMarkerClick(marker));
          }
 
-         const popupContent = `
+         // Contenido del popup con información específica
+         let popupContent = `
             <div class="${styles.popupContent}">
                <h3>${marker.name}</h3>
                <p>${marker.unlocked ? "✅ Disponible" : "🔒 Bloqueada"}</p>
-               ${marker.type === "ar" && marker.unlocked ? "<p>🎮 Toca para iniciar AR</p>" : ""}
-            </div>
          `;
+
+         // Añadir información específica para marcadores AR
+         if (marker.type === "ar" && marker.unlocked && marker.arModel) {
+            popupContent += `
+               <p>${getARDescription(marker.arModel)}</p>
+               <p><strong>🎮 Toca para iniciar AR</strong></p>
+            `;
+         } else if (marker.type === "ar" && marker.unlocked) {
+            popupContent += `<p>🎮 Toca para iniciar AR</p>`;
+         }
+
+         popupContent += `</div>`;
 
          return {
             coordinates: marker.coordinates,
@@ -197,10 +248,9 @@ const MapView = () => {
             </div>
          )}
 
-         {/* ⭐ CONTROLES SIMPLIFICADOS - El GeolocateControl ya está en el mapa */}
+         {/* Controles del mapa */}
          {isReady && (
             <div className={styles.mapControls}>
-               {/* Botón adicional para ir al usuario (opcional, ya tienes el control nativo) */}
                {userLocation && (
                   <button className={styles.controlButton} onClick={goToUser} title="Ir a mi ubicación">
                      📍

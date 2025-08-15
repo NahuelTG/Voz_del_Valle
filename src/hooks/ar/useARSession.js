@@ -1,4 +1,4 @@
-// hooks/useARSession.js
+// hooks/ar/useARSession.js
 import { useState, useEffect, useRef, useCallback } from "react";
 
 export const useARSession = (renderer, isARSupported, scene) => {
@@ -6,11 +6,14 @@ export const useARSession = (renderer, isARSupported, scene) => {
    const [isTracked, setIsTracked] = useState(false);
    const isStartedRef = useRef(false);
    const isTrackedRef = useRef(false);
+   const sessionInitialized = useRef(false);
 
    const startAR = useCallback(async () => {
-      if (!isARSupported || !renderer) return;
+      if (!isARSupported || !renderer || sessionInitialized.current) return;
 
       try {
+         console.log("🚀 Iniciando sesión AR...");
+
          const session = await navigator.xr.requestSession("immersive-ar", {
             requiredFeatures: ["hit-test"],
             optionalFeatures: ["dom-overlay"],
@@ -18,16 +21,41 @@ export const useARSession = (renderer, isARSupported, scene) => {
          });
 
          renderer.xr.setReferenceSpaceType("local");
-         renderer.xr.setSession(session);
+
+         session.addEventListener("visibilitychange", () => {
+            if (session.visibilityState === "visible") {
+               console.log("✅ Sesión AR visible y lista");
+               isStartedRef.current = true;
+               setIsStarted(true);
+            }
+         });
+
+         // Configurar la sesión
+         await renderer.xr.setSession(session);
+         sessionInitialized.current = true;
+
+         console.log("🎯 Sesión AR configurada");
       } catch (error) {
+         console.log("🔄 Fallback: Intentando sin DOM overlay...");
          try {
             const session = await navigator.xr.requestSession("immersive-ar", {
                requiredFeatures: ["hit-test"],
             });
+
             renderer.xr.setReferenceSpaceType("local");
-            renderer.xr.setSession(session);
+
+            session.addEventListener("visibilitychange", () => {
+               if (session.visibilityState === "visible") {
+                  console.log("✅ Sesión AR visible (fallback)");
+                  isStartedRef.current = true;
+                  setIsStarted(true);
+               }
+            });
+
+            await renderer.xr.setSession(session);
+            sessionInitialized.current = true;
          } catch (fallbackError) {
-            console.error("Error iniciando AR:", fallbackError, error);
+            console.error("❌ Error iniciando AR:", fallbackError, error);
          }
       }
    }, [isARSupported, renderer]);
@@ -43,14 +71,20 @@ export const useARSession = (renderer, isARSupported, scene) => {
       if (!renderer) return;
 
       const handleSessionStart = () => {
+         console.log("🎬 Sesión AR iniciada");
          if (scene) scene.background = null;
-         isStartedRef.current = true;
-         setIsStarted(true);
+
+         setTimeout(() => {
+            isStartedRef.current = true;
+            setIsStarted(true);
+         }, 500);
       };
 
       const handleSessionEnd = () => {
+         console.log("🛑 Sesión AR terminada");
          isStartedRef.current = false;
          isTrackedRef.current = false;
+         sessionInitialized.current = false;
          setIsStarted(false);
          setIsTracked(false);
       };
@@ -65,8 +99,8 @@ export const useARSession = (renderer, isARSupported, scene) => {
    }, [renderer, scene]);
 
    useEffect(() => {
-      if (isARSupported && renderer) {
-         setTimeout(startAR, 1000);
+      if (isARSupported && renderer && !sessionInitialized.current) {
+         setTimeout(startAR, 2000);
       }
    }, [isARSupported, renderer, startAR]);
 
