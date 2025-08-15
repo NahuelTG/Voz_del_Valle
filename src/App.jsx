@@ -1,4 +1,4 @@
-// src/App.jsx - Con React Router
+// src/App.jsx - Con rutas AR específicas
 import { useState, useRef } from "react";
 import { Routes, Route } from "react-router";
 import { useTheme } from "./hooks/useTheme";
@@ -13,7 +13,7 @@ import BottomNavigation from "./components/layout/BottomNavigation/BottomNavigat
 import MenuButton from "./components/layout/MenuButton/MenuButton";
 import EnhancedRouteSlider from "./components/features/routes/EnhancedRouteSlider";
 import CodeModal from "./components/features/code/CodeModal";
-import CameraWebXR from "./components/features/ar/CameraWebXR";
+import CameraWebXR from "./components/features/ar/CameraWebXR"; // Componente genérico
 
 import { VIEWS, ROUTES_DATA, ACHIEVEMENTS_DATA } from "./utils/constants";
 
@@ -118,12 +118,21 @@ const MainApp = () => {
    );
 };
 
-// App principal con rutas
+// App principal con rutas para diferentes modelos AR
 const App = () => {
    return (
       <Routes>
          <Route path="/" element={<MainApp />} />
-         <Route path="/ar/lobo" element={<CameraWebXR />} />
+
+         {/* 🎯 Rutas específicas para cada modelo AR */}
+         <Route path="/ar/lobo" element={<CameraWebXR modelType="wolf" />} />
+         <Route path="/ar/duende" element={<CameraWebXR modelType="duende" />} />
+         <Route path="/ar/murcielago" element={<CameraWebXR modelType="murcielago" />} />
+
+         {/* 🔄 Rutas de compatibilidad */}
+         <Route path="/ar/wolf" element={<CameraWebXR modelType="wolf" />} />
+         <Route path="/ar/gnome" element={<CameraWebXR modelType="duende" />} />
+         <Route path="/ar/bat" element={<CameraWebXR modelType="murcielago" />} />
       </Routes>
    );
 };

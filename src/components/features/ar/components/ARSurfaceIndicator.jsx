@@ -1,19 +1,19 @@
-// components/ARSurfaceIndicator.jsx - Modificado para lobo
+// components/ARSurfaceIndicator.jsx - Indicador genérico para cualquier modelo
 import PropTypes from "prop-types";
 
-const ARSurfaceIndicator = ({ surfaceDetected, hasWolf }) => {
+const ARSurfaceIndicator = ({ surfaceDetected, hasModel, modelConfig }) => {
    if (!surfaceDetected) return null;
 
    const getMessage = () => {
-      if (hasWolf) {
-         return "🐺 Lobo único colocado - Usa los controles para interactuar";
+      if (hasModel) {
+         return `${modelConfig.icon} ${modelConfig.name} colocado - Usa los controles para interactuar`;
       }
-      return "✅ Superficie detectada - Toca para colocar UN lobo";
+      return `✅ Superficie detectada - Toca para colocar ${modelConfig.name}`;
    };
 
    const getBackgroundColor = () => {
-      if (hasWolf) {
-         return "rgba(255, 136, 0, 0.9)"; // Naranja cuando hay lobo
+      if (hasModel) {
+         return "rgba(255, 136, 0, 0.9)"; // Naranja cuando hay modelo
       }
       return "rgba(0, 255, 136, 0.9)"; // Verde cuando se puede colocar
    };
@@ -44,7 +44,11 @@ const ARSurfaceIndicator = ({ surfaceDetected, hasWolf }) => {
 
 ARSurfaceIndicator.propTypes = {
    surfaceDetected: PropTypes.bool.isRequired,
-   hasWolf: PropTypes.bool.isRequired,
+   hasModel: PropTypes.bool.isRequired,
+   modelConfig: PropTypes.shape({
+      icon: PropTypes.node.isRequired,
+      name: PropTypes.string.isRequired,
+   }).isRequired,
 };
 
 export default ARSurfaceIndicator;

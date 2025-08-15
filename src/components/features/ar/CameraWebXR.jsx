@@ -1,7 +1,7 @@
-// CameraWebXR.jsx - Usando sistema MindAR con Factory Pattern
-import { useRef, useState, useMemo } from "react";
+// CameraWebXR.jsx - Componente genérico para cualquier modelo AR
+import { useRef, useMemo } from "react";
 import { useNavigate } from "react-router";
-import * as THREE from "three";
+import PropTypes from "prop-types";
 
 // Hooks AR personalizados
 import { useARSupport } from "../../../hooks/ar/useARSupport";
@@ -12,36 +12,48 @@ import { useARControls } from "../../../hooks/ar/useARControls";
 import { useARRender } from "../../../hooks/ar/useARRender";
 import { useWindowResize } from "../../../hooks/ar/useWindowResize";
 
-// Sistema de modelos AR
-import { ARModelFactory } from "../../../models/ARModelFactory.js";
+// Hooks específicos de modelos
+import { useWolfControls } from "../../../hooks/ar/models/useWolfControls.js";
+import { useDuendeControls } from "../../../hooks/ar/models/useDuendeControls.js";
+import { useMurcielagoControls } from "../../../hooks/ar/models/useMurcielagoControls.js";
 
 // Componentes UI
 import ARLoadingIndicator from "./components/ARLoadingIndicator";
 import ARErrorMessage from "./components/ARErrorMessage";
 import ARSurfaceIndicator from "./components/ARSurfaceIndicator";
-import ARWolfControls from "./components/ARWolfControls";
+import ARModelControls from "./components/ARModelControls"; // Componente genérico
 import AROverlay from "./components/AROverlay";
 
-const CameraWebXR = () => {
+const CameraWebXR = ({ modelType = "wolf" }) => {
    const canvasRef = useRef(null);
    const navigate = useNavigate();
-   const [hasWolf, setHasWolf] = useState(false);
-   const [isWolfLoaded, setIsWolfLoaded] = useState(false);
-   const wolfModelRef = useRef(null);
-   const anchorRef = useRef(null);
 
-   // 🎯 Crear modelo del lobo usando Factory Pattern
-   const wolfModel = useMemo(() => {
-      return ARModelFactory.createModel("wolf", {
-         // 🐺 Configuraciones específicas para WebXR
-         scale: { x: 1, y: 1, z: 1 }, // Escala más pequeña para WebXR
-         position: { x: 0, y: 0, z: 0 }, // Posición centrada
-         rotation: { x: 0, y: 0, z: 0 }, // Rotación para que mire al frente
-         animationSpeed: 1.2,
-         eyeGlow: true,
-         howlOnAppear: true,
-      });
-   }, []);
+   // 🎯 Llamar todos los hooks siempre (reglas de React)
+   const wolfControls = useWolfControls();
+   const duendeControls = useDuendeControls();
+   const murcielagoControls = useMurcielagoControls();
+
+   // Seleccionar el control activo según el tipo de modelo
+   const modelControls = useMemo(() => {
+      switch (modelType.toLowerCase()) {
+         case "wolf":
+         case "lobo":
+            return wolfControls;
+         case "duende":
+         case "gnome":
+            return duendeControls;
+         case "murcielago":
+         case "bat":
+            return murcielagoControls;
+         default:
+            console.warn(`Tipo de modelo no reconocido: ${modelType}, usando lobo por defecto`);
+            return wolfControls;
+      }
+   }, [modelType, wolfControls, duendeControls, murcielagoControls]);
+
+   // Extraer datos del hook seleccionado
+   const { hasModel, isModelLoaded, addModel, removeModel, triggerModelAction, updateModel, setIgnoreSelect, checkShouldIgnoreSelect } =
+      modelControls;
 
    // 1. Verificar soporte AR
    const isARSupported = useARSupport();
@@ -55,158 +67,89 @@ const CameraWebXR = () => {
    // 4. Hit Testing
    const { surfaceDetected, processHitTest } = useHitTest(renderer, reticle, pointer, camera, isStartedRef, setIsTracked);
 
-   // 5. Función para añadir lobo
-   const addWolf = async () => {
-      if (!reticle?.visible || !scene || hasWolf || !wolfModel) return;
+   // 5. Controladores AR
+   useARControls(renderer, () => addModel(reticle, scene), checkShouldIgnoreSelect);
 
-      try {
-         console.log("🔄 Cargando modelo del lobo...");
-
-         // Cargar el modelo
-         await wolfModel.load();
-
-         // Crear un anchor manual (grupo) en la posición del reticle
-         const anchor = new THREE.Group();
-         const position = new THREE.Vector3().setFromMatrixPosition(reticle.matrix);
-         anchor.position.copy(position);
-         anchor.position.y += 0.05; // Elevar un poco del suelo
-
-         scene.add(anchor);
-         anchorRef.current = anchor;
-
-         // Añadir el modelo al anchor
-         wolfModel.addToAnchor({ group: anchor });
-         wolfModel.show();
-
-         wolfModelRef.current = wolfModel;
-         setHasWolf(true);
-         setIsWolfLoaded(true);
-
-         console.log("✅ Lobo añadido exitosamente");
-      } catch (error) {
-         console.error("❌ Error añadiendo lobo:", error);
-      }
-   };
-
-   // 6. Función para remover TODOS los lobos
-   const removeWolf = () => {
-      if (!scene) return;
-
-      try {
-         // Buscar y remover todos los lobos en la escena
-         const objectsToRemove = [];
-
-         scene.traverse((child) => {
-            // Buscar grupos que contengan modelos de lobo
-            if (child.isGroup && child.children.length > 0) {
-               // Verificar si el grupo contiene un modelo de lobo
-               const hasWolfModel = child.children.some((grandchild) => grandchild.isGroup || grandchild.isMesh);
-               if (hasWolfModel) {
-                  objectsToRemove.push(child);
-               }
-            }
-         });
-
-         // Remover todos los lobos encontrados
-         objectsToRemove.forEach((wolfGroup) => {
-            // Limpiar materiales y geometrías
-            wolfGroup.traverse((child) => {
-               if (child.geometry) child.geometry.dispose();
-               if (child.material) {
-                  if (Array.isArray(child.material)) {
-                     child.material.forEach((mat) => mat.dispose());
-                  } else {
-                     child.material.dispose();
-                  }
-               }
-            });
-
-            scene.remove(wolfGroup);
-         });
-
-         // Limpiar el modelo actual si existe
-         if (wolfModelRef.current) {
-            wolfModelRef.current.dispose();
-            wolfModelRef.current = null;
-         }
-
-         anchorRef.current = null;
-         setHasWolf(false);
-         setIsWolfLoaded(false);
-
-         console.log(`🐺 ${objectsToRemove.length} lobo(s) removido(s) del escenario`);
-      } catch (error) {
-         console.error("❌ Error removiendo lobos:", error);
-      }
-   };
-
-   // 7. Función para hacer aullar
-   const triggerHowl = () => {
-      if (wolfModelRef.current) {
-         wolfModelRef.current.triggerModelAction?.("playHowlAnimation");
-         console.log("🐺 ¡Auuuuu! El lobo está aullando");
-      }
-   };
-
-   // 8. Función shouldIgnoreSelect - EVITAR COLOCACIÓN AUTOMÁTICA
-   const shouldIgnoreSelect = useRef(false);
-
-   const setIgnoreSelect = (ignore) => {
-      shouldIgnoreSelect.current = ignore;
-      // Auto-reset después de un breve tiempo
-      if (ignore) {
-         setTimeout(() => {
-            shouldIgnoreSelect.current = false;
-         }, 500);
-      }
-   };
-
-   const checkShouldIgnoreSelect = () => shouldIgnoreSelect.current;
-
-   // 9. Controladores AR con protección
-   useARControls(renderer, addWolf, checkShouldIgnoreSelect);
-
-   // 10. Loop de renderizado con actualización del modelo
+   // 6. Loop de renderizado con actualización del modelo
    const customProcessHitTest = (frame) => {
       processHitTest(frame);
 
-      // Actualizar animaciones del lobo si está cargado
-      if (isWolfLoaded && wolfModelRef.current) {
+      // Actualizar animaciones del modelo si está cargado
+      if (isModelLoaded) {
          const delta = 0.016; // ~60fps
-         wolfModelRef.current.update(delta);
+         updateModel(delta);
       }
    };
 
    useARRender(renderer, scene, camera, customProcessHitTest);
 
-   // 11. Redimensionado
+   // 7. Redimensionado
    useWindowResize(camera, renderer);
 
    // Handlers con protección contra colocación automática
    const handleStopAR = () => {
-      if (hasWolf) {
-         removeWolf();
+      if (hasModel) {
+         removeModel(scene);
       }
       stopAR();
       navigate("/");
    };
 
-   const handleAddWolf = () => {
-      if (!hasWolf && surfaceDetected) {
-         setIgnoreSelect(true); // Evitar colocación automática
-         addWolf();
+   const handleAddModel = () => {
+      if (!hasModel && surfaceDetected) {
+         setIgnoreSelect(true);
+         addModel(reticle, scene);
       }
    };
 
-   const handleRemoveWolf = () => {
-      setIgnoreSelect(true); // Evitar colocación automática tras remover
-      removeWolf();
+   const handleRemoveModel = () => {
+      setIgnoreSelect(true);
+      removeModel(scene);
    };
 
-   const handleTriggerHowl = () => {
-      setIgnoreSelect(true); // Evitar interferencia con audio
-      triggerHowl();
+   const handleTriggerAction = () => {
+      setIgnoreSelect(true);
+      triggerModelAction();
    };
+
+   // Configuración específica por modelo para UI
+   const getModelConfig = () => {
+      switch (modelType.toLowerCase()) {
+         case "wolf":
+         case "lobo":
+            return {
+               name: "Lobo del Valle",
+               icon: "🐺",
+               actionIcon: "🎵",
+               actionText: "Aullar",
+            };
+         case "duende":
+         case "gnome":
+            return {
+               name: "Duende Mágico",
+               icon: "🧚‍♂️",
+               actionIcon: "✨",
+               actionText: "Magia",
+            };
+         case "murcielago":
+         case "bat":
+            return {
+               name: "Murciélago Nocturno",
+               icon: "🦇",
+               actionIcon: "🌙",
+               actionText: "Volar",
+            };
+         default:
+            return {
+               name: "Modelo AR",
+               icon: "🎭",
+               actionIcon: "🎬",
+               actionText: "Acción",
+            };
+      }
+   };
+
+   const modelConfig = getModelConfig();
 
    return (
       <div style={containerStyles}>
@@ -225,19 +168,24 @@ const CameraWebXR = () => {
 
             <ARErrorMessage isReady={isReady} isARSupported={isARSupported} />
 
-            <ARSurfaceIndicator surfaceDetected={surfaceDetected} hasWolf={hasWolf} />
+            <ARSurfaceIndicator surfaceDetected={surfaceDetected} hasModel={hasModel} modelConfig={modelConfig} />
 
-            <ARWolfControls
+            <ARModelControls
                surfaceDetected={surfaceDetected}
-               hasWolf={hasWolf}
-               onAddWolf={handleAddWolf}
-               onRemoveWolf={handleRemoveWolf}
-               onTriggerHowl={handleTriggerHowl}
+               hasModel={hasModel}
+               modelConfig={modelConfig}
+               onAddModel={handleAddModel}
+               onRemoveModel={handleRemoveModel}
+               onTriggerAction={handleTriggerAction}
                onExit={handleStopAR}
             />
          </AROverlay>
       </div>
    );
+};
+
+CameraWebXR.propTypes = {
+   modelType: PropTypes.string,
 };
 
 // Estilos
