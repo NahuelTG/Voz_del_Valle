@@ -1,32 +1,66 @@
-// hooks/useARRender.js
-import { useEffect, useCallback } from "react";
+// hooks/ar/useARRender.js - SOLUCIÓN COMPLETA
+import { useEffect, useCallback, useRef } from "react";
 
-export const useARRender = (renderer, scene, camera, processHitTest) => {
+export const useARRender = (renderer, scene, camera, processHitTest, isStartedRef) => {
+   const animationLoopActive = useRef(false);
+
    const render = useCallback(
       (timestamp, frame) => {
          if (!renderer || !scene || !camera) return;
 
-         // Procesar hit test si está disponible
-         if (processHitTest) {
-            processHitTest(frame);
+         if (!isStartedRef?.current || !frame || !renderer.xr.isPresenting) {
+            return;
          }
 
-         renderer.render(scene, camera);
+         try {
+            if (processHitTest) {
+               processHitTest(frame);
+            }
+
+            renderer.clear();
+
+            renderer.render(scene, camera);
+         } catch (error) {
+            console.warn("Error en renderizado XR:", error);
+
+            if (renderer && animationLoopActive.current) {
+               renderer.setAnimationLoop(null);
+               animationLoopActive.current = false;
+            }
+         }
       },
-      [renderer, scene, camera, processHitTest]
+      [renderer, scene, camera, processHitTest, isStartedRef]
    );
 
    useEffect(() => {
       if (!renderer) return;
 
-      renderer.setAnimationLoop(render);
+      if (!animationLoopActive.current) {
+         renderer.setAnimationLoop(render);
+         animationLoopActive.current = true;
+      }
 
       return () => {
-         if (renderer) {
+         if (renderer && animationLoopActive.current) {
             renderer.setAnimationLoop(null);
+            animationLoopActive.current = false;
          }
       };
    }, [renderer, render]);
+
+   useEffect(() => {
+      if (!isStartedRef?.current && renderer && animationLoopActive.current) {
+         renderer.setAnimationLoop(null);
+         animationLoopActive.current = false;
+
+         setTimeout(() => {
+            if (isStartedRef?.current && renderer && !animationLoopActive.current) {
+               renderer.setAnimationLoop(render);
+               animationLoopActive.current = true;
+            }
+         }, 100);
+      }
+   }, [renderer, render, isStartedRef]);
 
    return { render };
 };

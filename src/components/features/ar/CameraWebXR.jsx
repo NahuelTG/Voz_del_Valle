@@ -1,4 +1,4 @@
-// CameraWebXR.jsx - Componente genérico para cualquier modelo AR
+// CameraWebXR.jsx - CORREGIDO
 import { useRef, useMemo } from "react";
 import { useNavigate } from "react-router";
 import PropTypes from "prop-types";
@@ -21,7 +21,7 @@ import { useMurcielagoControls } from "../../../hooks/ar/models/useMurcielagoCon
 import ARLoadingIndicator from "./components/ARLoadingIndicator";
 import ARErrorMessage from "./components/ARErrorMessage";
 import ARSurfaceIndicator from "./components/ARSurfaceIndicator";
-import ARModelControls from "./components/ARModelControls"; // Componente genérico
+import ARModelControls from "./components/ARModelControls";
 import AROverlay from "./components/AROverlay";
 
 const CameraWebXR = ({ modelType = "wolf" }) => {
@@ -33,7 +33,6 @@ const CameraWebXR = ({ modelType = "wolf" }) => {
    const duendeControls = useDuendeControls();
    const murcielagoControls = useMurcielagoControls();
 
-   // Seleccionar el control activo según el tipo de modelo
    const modelControls = useMemo(() => {
       switch (modelType.toLowerCase()) {
          case "wolf":
@@ -51,7 +50,6 @@ const CameraWebXR = ({ modelType = "wolf" }) => {
       }
    }, [modelType, wolfControls, duendeControls, murcielagoControls]);
 
-   // Extraer datos del hook seleccionado
    const { hasModel, isModelLoaded, addModel, removeModel, triggerModelAction, updateModel, setIgnoreSelect, checkShouldIgnoreSelect } =
       modelControls;
 
@@ -61,7 +59,7 @@ const CameraWebXR = ({ modelType = "wolf" }) => {
    // 2. Inicializar Three.js
    const { isReady, scene, camera, renderer, reticle, pointer } = useThreeJS(canvasRef);
 
-   // 3. Sesión AR
+   // 3. Sesión AR - 🔥 IMPORTANTE: Obtener isStartedRef
    const { stopAR, isStartedRef, setIsTracked } = useARSession(renderer, isARSupported, scene);
 
    // 4. Hit Testing
@@ -70,18 +68,17 @@ const CameraWebXR = ({ modelType = "wolf" }) => {
    // 5. Controladores AR
    useARControls(renderer, () => addModel(reticle, scene), checkShouldIgnoreSelect);
 
-   // 6. Loop de renderizado con actualización del modelo
+   // 6. Loop de renderizado con actualización del modelo - 🔥 PASAR isStartedRef
    const customProcessHitTest = (frame) => {
       processHitTest(frame);
 
-      // Actualizar animaciones del modelo si está cargado
       if (isModelLoaded) {
-         const delta = 0.016; // ~60fps
+         const delta = 0.016;
          updateModel(delta);
       }
    };
 
-   useARRender(renderer, scene, camera, customProcessHitTest);
+   useARRender(renderer, scene, camera, customProcessHitTest, isStartedRef);
 
    // 7. Redimensionado
    useWindowResize(camera, renderer);
