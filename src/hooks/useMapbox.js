@@ -1,4 +1,4 @@
-// src/hooks/useMapbox.js - VERSIÓN CORREGIDA
+// src/hooks/useMapbox.js - CON GEOLOCATE CONTROL
 import { useEffect, useState, useRef, useCallback } from "react";
 import mapboxgl from "mapbox-gl";
 
@@ -9,26 +9,7 @@ export const useMapbox = (containerRef) => {
 
    const map = useRef(null);
    const markers = useRef([]);
-
-   const getUserLocation = useCallback(() => {
-      if (!navigator.geolocation) return;
-
-      navigator.geolocation.getCurrentPosition(
-         (position) => {
-            const location = [position.coords.longitude, position.coords.latitude];
-            setUserLocation(location);
-
-            if (map.current) {
-               map.current.flyTo({ center: location, zoom: 15 });
-            }
-         },
-         (error) => {
-            console.warn("No se pudo obtener la ubicación:", error.message);
-            setUserLocation(null);
-         },
-         { timeout: 10000, enableHighAccuracy: true }
-      );
-   }, []);
+   const geolocateControl = useRef(null); // ⭐ Control nativo de Mapbox
 
    useEffect(() => {
       const token = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
@@ -49,9 +30,36 @@ export const useMapbox = (containerRef) => {
          zoom: 12,
       });
 
+      // ⭐ CREAR GEOLOCATE CONTROL (como el componente desordenado)
+      geolocateControl.current = new mapboxgl.GeolocateControl({
+         positionOptions: {
+            enableHighAccuracy: true, // Ubicación más precisa
+         },
+         trackUserLocation: true, // ⭐ SIGUE AL USUARIO EN TIEMPO REAL
+         showUserHeading: true, // Muestra dirección del usuario
+         showUserLocation: true, // Muestra punto de ubicación
+         fitBoundsOptions: {
+            maxZoom: 16, // Zoom máximo al centrar
+         },
+      });
+
+      // ⭐ AÑADIR CONTROL AL MAPA
+      map.current.addControl(geolocateControl.current, "top-right");
+
+      // ⭐ EVENTOS DE GEOLOCALIZACIÓN
+      geolocateControl.current.on("geolocate", (e) => {
+         const location = [e.coords.longitude, e.coords.latitude];
+         setUserLocation(location);
+         console.log("Ubicación actualizada:", location);
+      });
+
+      geolocateControl.current.on("error", (e) => {
+         console.error("Error de geolocalización:", e.message);
+         setError("Error al obtener ubicación");
+      });
+
       map.current.on("load", () => {
          setIsReady(true);
-         getUserLocation();
       });
 
       map.current.on("error", (e) => {
@@ -66,7 +74,27 @@ export const useMapbox = (containerRef) => {
             setIsReady(false);
          }
       };
-   }, [containerRef, getUserLocation]);
+   }, [containerRef]);
+
+   // ⭐ FUNCIÓN PARA ACTIVAR TRACKING MANUAL
+   const startTracking = useCallback(() => {
+      if (geolocateControl.current) {
+         geolocateControl.current.trigger();
+      }
+   }, []);
+
+   // ⭐ FUNCIÓN PARA IR AL USUARIO
+   const goToUser = useCallback(() => {
+      if (userLocation && map.current) {
+         map.current.flyTo({
+            center: userLocation,
+            zoom: 16,
+            duration: 1500,
+         });
+      } else {
+         startTracking();
+      }
+   }, [userLocation, startTracking]);
 
    const addMarkers = useCallback(
       (markersData) => {
@@ -105,14 +133,6 @@ export const useMapbox = (containerRef) => {
       }
    }, []);
 
-   const goToUser = useCallback(() => {
-      if (userLocation && map.current) {
-         map.current.flyTo({ center: userLocation, zoom: 15 });
-      } else {
-         getUserLocation();
-      }
-   }, [userLocation, getUserLocation]);
-
    const setStyle = useCallback((style) => {
       if (map.current) {
          map.current.setStyle(style);
@@ -123,6 +143,7 @@ export const useMapbox = (containerRef) => {
       isReady,
       error,
       userLocation,
+      startTracking,
       addMarkers,
       fitToMarkers,
       goToUser,

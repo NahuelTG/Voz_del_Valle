@@ -11,31 +11,89 @@ import styles from "./MapView.module.css";
 const ROUTE_MARKERS = [
    {
       id: 1,
-      name: "Ruta Sonora",
-      coordinates: [-66.1568, -17.3895],
-      icon: "🎵",
+      name: "Inicio de Ruta - Sonido",
+      coordinates: [-66.175231, -17.366733],
+      icon: "🏁",
       unlocked: true,
    },
    {
       id: 2,
-      name: "Caminos de Memoria",
-      coordinates: [-66.1468, -17.3795],
-      icon: "🔒",
-      unlocked: false,
+      name: "Duende",
+      coordinates: [-66.174238, -17.36632],
+      icon: "AR",
+      type: "ar",
+      unlocked: true,
    },
    {
       id: 3,
-      name: "Ecos del Pasado",
-      coordinates: [-66.1668, -17.3995],
-      icon: "🔒",
-      unlocked: false,
+      name: "Lavadero y sonidos del agua",
+      coordinates: [-66.167676, -17.365103],
+      icon: "🎵",
+      unlocked: true,
    },
    {
       id: 4,
-      name: "Lobo del Valle",
-      coordinates: [-66.1668, -17.3695],
+      name: "Pasaje escudaño",
+      coordinates: [-66.169489, -17.364428],
+      icon: "🎵",
+      unlocked: true,
+   },
+   {
+      id: 5,
+      name: "Puente de colores",
+      coordinates: [-66.15892, -17.368894],
+      icon: "🎵",
+      unlocked: true,
+   },
+   {
+      id: 6,
+      name: "Amerinst",
+      coordinates: [-66.155583, -17.36993],
+      icon: "🎵",
+      unlocked: true,
+   },
+   {
+      id: 7,
+      name: "Parque Fidel Anze",
+      coordinates: [-66.152753, -17.370765],
       icon: "AR",
       type: "ar",
+      unlocked: true,
+   },
+   {
+      id: 8,
+      name: "El Pueblito",
+      coordinates: [-66.139431, -17.374837],
+      icon: "🎵",
+      unlocked: true,
+   },
+   {
+      id: 9,
+      name: "El puente",
+      coordinates: [-66.138117, -17.377397],
+      icon: "AR",
+      type: "ar",
+      unlocked: true,
+   },
+   {
+      id: 10,
+      name: " Casa de Piedra",
+      coordinates: [-66.141846, -17.382329],
+      icon: "🎵",
+      unlocked: true,
+   },
+   {
+      id: 11,
+      name: "Mirador 1",
+      coordinates: [-66.140543, -17.387445],
+      icon: "🎵",
+      unlocked: true,
+   },
+   {
+      id: 12,
+      name: "Mirador 2 - final",
+      coordinates: [-66.132983, -17.400934],
+      icon: "🎵",
       unlocked: true,
    },
 ];
@@ -63,6 +121,7 @@ FallbackMarker.propTypes = {
 const MapView = () => {
    const navigate = useNavigate();
    const mapContainer = useRef(null);
+
    const { isReady, error, userLocation, addMarkers, fitToMarkers, goToUser, setStyle } = useMapbox(mapContainer);
 
    const handleMarkerClick = useCallback(
@@ -90,7 +149,6 @@ const MapView = () => {
             </div>
          `;
 
-         // Añadir event listener para el click
          if (marker.unlocked) {
             element.addEventListener("click", () => handleMarkerClick(marker));
          }
@@ -121,9 +179,6 @@ const MapView = () => {
                   <h3>🗺️ Vista básica</h3>
                   <p>{error}</p>
                </div>
-               {ROUTE_MARKERS.map((marker) => (
-                  <FallbackMarker key={marker.id} marker={marker} />
-               ))}
             </div>
          </div>
       );
@@ -138,22 +193,29 @@ const MapView = () => {
                <div className={styles.loadingContainer}>
                   <div className={styles.spinner}></div>
                   <p>Cargando mapa...</p>
-                  <small>Obteniendo tu ubicación...</small>
                </div>
             </div>
          )}
 
+         {/* ⭐ CONTROLES SIMPLIFICADOS - El GeolocateControl ya está en el mapa */}
          {isReady && (
             <div className={styles.mapControls}>
+               {/* Botón adicional para ir al usuario (opcional, ya tienes el control nativo) */}
                {userLocation && (
-                  <button className={styles.controlButton} onClick={goToUser}>
+                  <button className={styles.controlButton} onClick={goToUser} title="Ir a mi ubicación">
                      📍
                   </button>
                )}
-               <button className={styles.controlButton} onClick={fitToMarkers}>
-                  🎯
+
+               <button className={styles.controlButton} onClick={fitToMarkers} title="Ver todos los marcadores">
+                  🗺️
                </button>
-               <button className={styles.controlButton} onClick={() => setStyle("mapbox://styles/mapbox/satellite-v9")}>
+
+               <button
+                  className={styles.controlButton}
+                  onClick={() => setStyle("mapbox://styles/mapbox/satellite-v9")}
+                  title="Vista satelital"
+               >
                   🛰️
                </button>
             </div>
